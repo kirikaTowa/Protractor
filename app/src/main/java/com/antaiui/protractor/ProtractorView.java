@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.DashPathEffect;
 import android.graphics.Matrix;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.PointF;
 import android.hardware.camera2.CaptureRequest;
 import android.os.Build;
@@ -31,7 +32,7 @@ public class ProtractorView extends View {
     private float mDegreeR = 90f;
     private Bitmap bitmap;
     private Bitmap mCenterDotBitmap;
-    private boolean mDebug = false;
+    private boolean mDebug = true;
     int moveType = 0;
     private String TAG = "ProtractorView";
     private MoveAngleCallBack mMoveAngleCallBack;
@@ -72,6 +73,9 @@ public class ProtractorView extends View {
             mPointLeft = new PointF(0,getHeight() * 1.0f - mPaddingBottom);
             mEndPoint1 = new PointF(mCenterPoint.x,  mCenterPoint.y - distance);
             mEndPoint2 = new PointF(mCenterPoint.x,  mCenterPoint.y - distance);
+
+
+
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inSampleSize = 2;
             bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.pointer_icon, options);
@@ -84,6 +88,21 @@ public class ProtractorView extends View {
             mCenterDotBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.center_dot_icon, options);
             Log.d(TAG, "draw center = " + mCenterPoint.toString() +  " end = " + mEndPoint1.toString());
         }
+
+        // 绘制矩形区域
+        Paint bluePaint = new Paint();
+        bluePaint.setColor(Color.BLUE);
+        bluePaint.setAlpha(50); // 设置透明度，使得颜色柔和
+
+
+        // 定义绘制区域
+        Path areaPath = new Path();
+        areaPath.moveTo(mCenterPoint.x, mCenterPoint.y); // 从中心点开始
+        areaPath.lineTo(mEndPoint1.x, mEndPoint1.y); // 左边的末端
+        areaPath.lineTo(mEndPoint2.x, mEndPoint2.y); // 右边的末端
+        areaPath.close(); // 封闭路径
+
+        canvas.drawPath(areaPath, bluePaint); // 用蓝色绘制区域
 
 
         if (mDebug) {
