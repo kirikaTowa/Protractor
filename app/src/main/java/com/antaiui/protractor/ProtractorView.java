@@ -29,7 +29,7 @@ public class ProtractorView extends View {
     private static final float MOVE_DISTANCE = 100;
     private int distance = 600;//debug线区域的长度
     private float mDegree = 0f;//回调的角度
-    private float mDegreeL = 90f;//初始角度
+    private float mDegreeL = 0f;//初始角度
     private float mDegreeR = 90f;//初始角度
     private Bitmap bitmap;
     private Bitmap mCenterDotBitmap;
