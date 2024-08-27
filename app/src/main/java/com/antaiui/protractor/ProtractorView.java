@@ -10,6 +10,7 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PointF;
+import android.graphics.RectF;
 import android.hardware.camera2.CaptureRequest;
 import android.os.Build;
 import android.util.AttributeSet;
@@ -26,10 +27,10 @@ public class ProtractorView extends View {
     private PointF mEndPoint2;
     private PointF mPointLeft;
     private static final float MOVE_DISTANCE = 100;
-    private int distance = 600;
-    private float mDegree = 0f;
-    private float mDegreeL = 90f;
-    private float mDegreeR = 90f;
+    private int distance = 600;//debug线区域的长度
+    private float mDegree = 0f;//回调的角度
+    private float mDegreeL = 90f;//初始角度
+    private float mDegreeR = 90f;//初始角度
     private Bitmap bitmap;
     private Bitmap mCenterDotBitmap;
     private boolean mDebug = true;
@@ -89,26 +90,40 @@ public class ProtractorView extends View {
             Log.d(TAG, "draw center = " + mCenterPoint.toString() +  " end = " + mEndPoint1.toString());
         }
 
-        // 绘制矩形区域
-        Paint bluePaint = new Paint();
-        bluePaint.setColor(Color.BLUE);
-        bluePaint.setAlpha(50); // 设置透明度，使得颜色柔和
 
 
-        // 定义绘制区域
-        Path areaPath = new Path();
-        areaPath.moveTo(mCenterPoint.x, mCenterPoint.y); // 从中心点开始
-        areaPath.lineTo(mEndPoint1.x, mEndPoint1.y); // 左边的末端
-        areaPath.lineTo(mEndPoint2.x, mEndPoint2.y); // 右边的末端
-        areaPath.close(); // 封闭路径
-
-        canvas.drawPath(areaPath, bluePaint); // 用蓝色绘制区域
 
 
         if (mDebug) {
             canvas.drawLine(mCenterPoint.x, mCenterPoint.y, mEndPoint1.x, mEndPoint1.y, mPaint);
             canvas.drawLine(mCenterPoint.x, mCenterPoint.y, mEndPoint2.x, mEndPoint2.y, mPaint);
         }
+        Paint fanPaint = new Paint();
+        fanPaint.setColor(Color.BLUE);
+
+
+        RectF oval = new RectF( mCenterPoint.x-distance, mCenterPoint.y-distance, mCenterPoint.x+distance, mCenterPoint.y+distance);
+
+        canvas.drawArc(oval, mDegreeL+180f, mDegreeR-mDegreeL, true, fanPaint); // 绘制扇形
+
+//        // 计算扇形的矩形边界
+//        float left = mCenterPoint.x - distance;
+//        float right = mCenterPoint.x + distance;
+//        float top = mCenterPoint.y - distance;
+//        float bottom = mCenterPoint.y;
+//
+//// 计算扇形的起始角度和覆盖角度
+//        float startAngle = mDegreeL; // 左侧角度
+//        float sweepAngle = mDegreeR-mDegreeL; // 计算覆盖的角度
+//
+//// 设置扇形画笔
+//        Paint fanPaint = new Paint();
+//        fanPaint.setColor(Color.BLUE);
+//        fanPaint.setAlpha(50); // 设置透明度
+//
+//// 绘制扇形
+//        RectF oval = new RectF(left, top, right, bottom);
+//        canvas.drawArc(oval, startAngle, sweepAngle, true, fanPaint);
 
 
         Matrix matrix = new Matrix();
