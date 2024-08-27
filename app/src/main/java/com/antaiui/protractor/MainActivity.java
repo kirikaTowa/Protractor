@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
         mProtractorView = findViewById(R.id.protractor_view);
         mProtractorView.setMoveAngleCallBack(this);
         mTvAngle = findViewById(R.id.tv_angle);
-        mTvAngle.setTypeface(Typeface.createFromAsset(getAssets(),  "BatmanForeverAlternate.ttf"));
+       // mTvAngle.setTypeface(Typeface.createFromAsset(getAssets(),  "BatmanForeverAlternate.ttf"));
 
 
     }
