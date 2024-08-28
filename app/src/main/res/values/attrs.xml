@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!--圆形大转盘-->
     <declare-styleable name="ProtractorView">
         <attr name="colorMantle" format="reference|color" />
         <attr name="resPointer" format="reference|color" />
