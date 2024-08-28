@@ -200,18 +200,36 @@ public class ProtractorView extends View {
 
     //computer∠yxz angle 三个二维点定角度  对应A,B,C,
     private float computerAngle(float x1, float y1, float x2, float y2, float x3, float y3) {
-        //向量的点乘，A-B，A-C向量点乘
-        float t = (x2 - x1) * (x3 - x1) + (y2 - y1) * (y3 - y1);
-        //夹角计算
-        float tL= (float) Math.sqrt((Math.abs((x2 - x1) * (x2 - x1)) + Math.abs((y2 - y1) * (y2 - y1)))
-                * (Math.abs((x3 - x1) * (x3 - x1)) + Math.abs((y3 - y1) * (y3 - y1))));
-        float result = (float) (180 * Math.acos(t / tL) / Math.PI);
-        //      pi   = 180
-        //      x    =  ？
-        //====> ?=180*x/pi
+        // 计算向量 AB 和 AC
+        float abX = x2 - x1;
+        float abY = y2 - y1;
+        float acX = x3 - x1;
+        float acY = y3 - y1;
 
-        return result;
+        // 向量的点乘
+        float dotProduct = abX * acX + abY * acY;
+
+        // 计算向量 AB 和 AC 的模长
+        float abLength = (float) Math.sqrt(abX * abX + abY * abY);
+        float acLength = (float) Math.sqrt(acX * acX + acY * acY);
+
+        // 检查向量长度是否为零以避免除以零的情况
+        if (abLength == 0 || acLength == 0) {
+            throw new IllegalArgumentException("输入的点不能重合，导致向量长度为零。");
+        }
+
+        // 计算余弦值
+        float cosAngle = dotProduct / (abLength * acLength);
+
+        // 确保余弦值在[-1, 1]之间，防止 acos 产生 NaN
+        cosAngle = Math.max(-1, Math.min(1, cosAngle));
+        // 使用反余弦函数计算角度，并转换为度
+        float angleInRadians = (float) Math.acos(cosAngle);
+        float angleInDegrees = (float) (angleInRadians * 180 / Math.PI);
+
+        return angleInDegrees;
     }
+
 
 
     public interface MoveAngleCallBack {
