@@ -67,7 +67,7 @@ public class ProtractorView extends View {
         this.context = context;
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.ProtractorView);
 
-        colorMantle = typedArray.getColor(R.styleable.ProtractorView_colorMantle, Color.WHITE);
+        colorMantle = typedArray.getColor(R.styleable.ProtractorView_colorMantle, Color.BLUE);
         resPointer = typedArray.getInt(R.styleable.ProtractorView_resPointer,R.drawable.pointer_icon);
 
         typedArray.recycle();
@@ -131,7 +131,7 @@ public class ProtractorView extends View {
             canvas.drawLine(mCenterPoint.x, mCenterPoint.y, mEndPoint2.x, mEndPoint2.y, mPaint);
         }
         Paint fanPaint = new Paint();
-        fanPaint.setColor(Color.BLUE);
+        fanPaint.setColor(colorMantle);
 
 
         RectF oval = new RectF(mCenterPoint.x - distance, mCenterPoint.y - distance, mCenterPoint.x + distance, mCenterPoint.y + distance);
