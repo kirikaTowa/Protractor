@@ -14,6 +14,8 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
+import androidx.annotation.LongDef;
+
 
 public class ProtractorView extends View {
     private PointF mCenterPoint;
@@ -106,7 +108,7 @@ public class ProtractorView extends View {
 
         RectF oval = new RectF(mCenterPoint.x - distance, mCenterPoint.y - distance, mCenterPoint.x + distance, mCenterPoint.y + distance);
         //mDegreeL，第一个参数需要动态调整，他的初始角度是-90，原因未知
-        canvas.drawArc(oval, mDegreeL + 270f, mDegreeR - mDegreeL, true, fanPaint); // 绘制扇形
+        canvas.drawArc(oval, mDegreeL -90f, mDegreeR - mDegreeL, true, fanPaint); // 绘制扇形
 
 
         Matrix matrix = new Matrix();
@@ -155,6 +157,9 @@ public class ProtractorView extends View {
             mDegree = computerAngle(mCenterPoint.x, mCenterPoint.y, mEndPoint1.x, mEndPoint1.y, mEndPoint2.x, mEndPoint2.y);
             //【最左端和线1夹角】中点，目标点1，左下角；
             mDegreeL = computerAngle(mCenterPoint.x, mCenterPoint.y, mEndPoint1.x, mEndPoint1.y, mPointLeft.x, mPointLeft.y);
+            //加个限制，转到0或180 会影响到会弧形 mDegreeL=NaN
+
+
             invalidate();
             mMoveAngleCallBack.angleCallBack(mDegree);
         } else if (moveType == 2) {
@@ -193,18 +198,14 @@ public class ProtractorView extends View {
 
 
 
-    //computer∠yxz angle
-    private float computerAngle(float x1, float x2, float y1, float y2, float z1, float z2) {
-        //向量的点乘
-        float t = (y1 - x1) * (z1 - x1) + (y2 - x2) * (z2 - x2);
-        //为了精确直接使用而不使用中间变量
-        //包含了步骤：A=向量的点乘/向量的模相乘
-        //          B=arccos(A)，用反余弦求出弧度
-        //          result=180*B/π 弧度转角度制
-        float result = (float) (180 * Math.acos(t / Math.sqrt
-                ((Math.abs((y1 - x1) * (y1 - x1)) + Math.abs((y2 - x2) * (y2 - x2)))
-                        * (Math.abs((z1 - x1) * (z1 - x1)) + Math.abs((z2 - x2) * (z2 - x2)))))
-                / Math.PI);
+    //computer∠yxz angle 三个二维点定角度  对应A,B,C,
+    private float computerAngle(float x1, float y1, float x2, float y2, float x3, float y3) {
+        //向量的点乘，A-B，A-C向量点乘
+        float t = (x2 - x1) * (x3 - x1) + (y2 - y1) * (y3 - y1);
+        //夹角计算
+        float tL= (float) Math.sqrt((Math.abs((x2 - x1) * (x2 - x1)) + Math.abs((y2 - y1) * (y2 - y1)))
+                * (Math.abs((x3 - x1) * (x3 - x1)) + Math.abs((y3 - y1) * (y3 - y1))));
+        float result = (float) (180 * Math.acos(t / tL) / Math.PI);
         //      pi   = 180
         //      x    =  ？
         //====> ?=180*x/pi
