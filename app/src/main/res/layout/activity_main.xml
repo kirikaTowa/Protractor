@@ -22,6 +22,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:id="@+id/tv_angle"
+        android:layout_marginTop="16dp"
         android:paddingTop="@dimen/angle_text_view_padding_top"
         android:textSize="@dimen/angle_text_size"
         android:textColor="@color/angle_text_color"

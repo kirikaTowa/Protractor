@@ -34,7 +34,7 @@ public class ProtractorView extends View {
     private float mDegree = 0f;//回调的角度
 
     //这里不写90有坑的
-    private float mDegreeL = 90f;//初始角度
+    private float mDegreeL = 0f;//初始角度
     private float mDegreeR = 90f;//初始角度
     private Bitmap bitmap;
     private Bitmap mCenterDotBitmap;
@@ -106,7 +106,7 @@ public class ProtractorView extends View {
 
             //TODO 如果想改初始红线位置改这里
             //现在这种坐标，x保持中点不变，通过减法distance 往上连线得到，俩先设置一样，如果
-            mEndPoint1 = new PointF(mCenterPoint.x+ distance, mCenterPoint.y );
+            mEndPoint1 = new PointF(0, mCenterPoint.y-distance );
             mEndPoint2 = new PointF(mCenterPoint.x+ distance, mCenterPoint.y );
 
 
