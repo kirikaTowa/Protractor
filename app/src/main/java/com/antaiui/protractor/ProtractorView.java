@@ -1,6 +1,7 @@
 package com.antaiui.protractor;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -9,15 +10,20 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.RectF;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.LongDef;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.core.widget.ScrollerCompat;
 
 
 public class ProtractorView extends View {
+    private Context context;
     private PointF mCenterPoint;
     private Paint mPaint;
     private PointF mEndPoint1;
@@ -37,9 +43,34 @@ public class ProtractorView extends View {
     private String TAG = "ProtractorView";
     private MoveAngleCallBack mMoveAngleCallBack;
     private int mPaddingBottom = 30;
+    private int colorMantle;
+    private int resPointer;
 
     public ProtractorView(Context context) {
         super(context);
+        init(context, null, 0);
+    }
+
+    public ProtractorView(Context context, AttributeSet attributeSet) {
+        super(context, attributeSet);
+        init(context, attributeSet, 0);
+    }
+
+    public ProtractorView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        init(context, attrs, 0);
+
+    }
+
+
+    private void init(Context context, AttributeSet attrs, int s) {
+        this.context = context;
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.ProtractorView);
+
+        colorMantle = typedArray.getColor(R.styleable.ProtractorView_colorMantle, Color.WHITE);
+        resPointer = typedArray.getInt(R.styleable.ProtractorView_resPointer,R.drawable.pointer_icon);
+
+        typedArray.recycle();
     }
 
     public void setMoveAngleCallBack(MoveAngleCallBack callBack) {
@@ -58,10 +89,7 @@ public class ProtractorView extends View {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
-    public ProtractorView(Context context, AttributeSet attributeSet) {
-        super(context, attributeSet);
 
-    }
 
     @Override
     public void draw(Canvas canvas) {
@@ -84,7 +112,7 @@ public class ProtractorView extends View {
 
             BitmapFactory.Options options = new BitmapFactory.Options();
             options.inSampleSize = 2;
-            bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.pointer_icon, options);
+            bitmap = BitmapFactory.decodeResource(getResources(), resPointer, options);
             Matrix matrix = new Matrix();
             //让图片转到正确角度，如果切图是横着的，可以调这个来实现效果
             matrix.postRotate(-90, bitmap.getWidth(), bitmap.getHeight());
