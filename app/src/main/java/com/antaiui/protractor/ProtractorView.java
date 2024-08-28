@@ -10,16 +10,12 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PointF;
 import android.graphics.RectF;
-import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-import androidx.annotation.LongDef;
 import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.core.widget.ScrollerCompat;
 
 
 public class ProtractorView extends View {
@@ -45,6 +41,7 @@ public class ProtractorView extends View {
     private int mPaddingBottom = 30;
     private int colorMantle;
     private int resPointer;
+    private Boolean isLeft = false;
 
     public ProtractorView(Context context) {
         super(context);
@@ -68,7 +65,8 @@ public class ProtractorView extends View {
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.ProtractorView);
 
         colorMantle = typedArray.getColor(R.styleable.ProtractorView_colorMantle, Color.BLUE);
-        resPointer = typedArray.getInt(R.styleable.ProtractorView_resPointer,R.drawable.pointer_icon);
+        resPointer = typedArray.getResourceId(R.styleable.ProtractorView_resPointer, R.drawable.pointer_icon);
+        isLeft = typedArray.getBoolean(R.styleable.ProtractorView_isLeft,true);
 
         typedArray.recycle();
     }
@@ -90,7 +88,6 @@ public class ProtractorView extends View {
     }
 
 
-
     @Override
     public void draw(Canvas canvas) {
         if (mPaint == null) {
@@ -99,15 +96,27 @@ public class ProtractorView extends View {
             mPaint.setColor(Color.RED);
             mPaint.setAntiAlias(true);
             //横版的话 左上角->竖着拿的右上角  才是【0.0】,当前坐标系【4x2】
-            //[2,2]
-            mCenterPoint = new PointF(0, getHeight() /2f);
-            //[0,2]，左下角的位置
-            mPointLeft = new PointF(0, 0);
+
+            if (isLeft) {
+                //[2,2]
+                mCenterPoint = new PointF(0, getHeight() / 2f);
+                //[0,2]，左下角的位置
+                mPointLeft = new PointF(0, 0);
+            } else {
+                mCenterPoint = new PointF(getWidth(), getHeight() / 2f);
+                mPointLeft = new PointF(getWidth(), getHeight());
+            }
+
 
             //TODO 如果想改初始红线位置改这里
-            //现在这种坐标，x保持中点不变，通过减法distance 往上连线得到，俩先设置一样，如果
-            mEndPoint1 = new PointF(0, mCenterPoint.y-distance );
-            mEndPoint2 = new PointF(mCenterPoint.x+ distance, mCenterPoint.y );
+            //现在这种坐标，x保持中点不变，通过减法distance 往上连线得到，俩先设置一样，如果、
+            if (isLeft) {
+                mEndPoint1 = new PointF(0, mCenterPoint.y - distance);
+                mEndPoint2 = new PointF(mCenterPoint.x + distance, mCenterPoint.y);
+            } else {
+                mEndPoint1 = new PointF(getWidth(), mCenterPoint.y + distance);
+                mEndPoint2 = new PointF(getWidth() - distance, mCenterPoint.y);
+            }
 
 
             BitmapFactory.Options options = new BitmapFactory.Options();
@@ -136,19 +145,33 @@ public class ProtractorView extends View {
 
         RectF oval = new RectF(mCenterPoint.x - distance, mCenterPoint.y - distance, mCenterPoint.x + distance, mCenterPoint.y + distance);
         //mDegreeL，第一个参数需要动态调整，他的初始角度是-90，原因未知
-        canvas.drawArc(oval, mDegreeL -90f, mDegreeR - mDegreeL, true, fanPaint); // 绘制扇形
+        if (isLeft) {
+            canvas.drawArc(oval, mDegreeL - 90f, mDegreeR - mDegreeL, true, fanPaint); // 绘制扇形
+        } else {
+            canvas.drawArc(oval, mDegreeL + 90f, mDegreeR - mDegreeL, true, fanPaint); // 绘制扇形
+        }
 
 
         Matrix matrix = new Matrix();
         int offsetX = bitmap.getWidth();
         int offsetY = bitmap.getHeight();
         matrix.preTranslate(mCenterPoint.x - offsetX, mCenterPoint.y - offsetY / 2f);
-        matrix.postRotate(mDegreeL+ 90f, mCenterPoint.x, mCenterPoint.y);
+        if (isLeft){
+            matrix.postRotate(mDegreeL + 90f, mCenterPoint.x, mCenterPoint.y);
+        }else{
+            matrix.postRotate(mDegreeL - 90f, mCenterPoint.x, mCenterPoint.y);
+        }
+
         canvas.drawBitmap(bitmap, matrix, mPaint);
 
         Matrix matrixR = new Matrix();
         matrixR.preTranslate(mCenterPoint.x - offsetX, mCenterPoint.y - offsetY / 2f);
-        matrixR.postRotate(mDegreeR+90f, mCenterPoint.x, mCenterPoint.y);
+        if (isLeft){
+            matrixR.postRotate(mDegreeR + 90f, mCenterPoint.x, mCenterPoint.y);
+        }else {
+            matrixR.postRotate(mDegreeR - 90f, mCenterPoint.x, mCenterPoint.y);
+        }
+
         canvas.drawBitmap(bitmap, matrixR, mPaint);
 
 
@@ -209,21 +232,33 @@ public class ProtractorView extends View {
         double distanceToCenter = Math.sqrt(Math.pow(movePoint.x - mCenterPoint.x, 2)
                 + Math.pow(movePoint.y - mCenterPoint.y, 2));
         //圆心到movepoint垂直距离：(getHeight() - movePoint.y)
-        double sin = ( movePoint.x) / distanceToCenter;
+
+        double sin = 0;
+        if (isLeft) {
+            sin = (movePoint.x) / distanceToCenter;
+        } else {
+            sin = (getWidth() - movePoint.x) / distanceToCenter;
+        }
+
         //圆心到 movePoint 的水平距离（movePoint.x - mCenterPoint.x） 这个用小减大
-        double cos = ( movePoint.y-mCenterPoint.y) / distanceToCenter;
+        double cos = (movePoint.y - mCenterPoint.y) / distanceToCenter;
 
-
-        PointF result = new PointF((float) (mCenterPoint.x + sin * distance),
-                (float) ( mCenterPoint.y+distance * cos));
         //设定边界 防出界面
-        if (result.x < mCenterPoint.x) {
-            result.x = mCenterPoint.x;
+        PointF result;
+        if (isLeft) {
+            result = new PointF((float) (mCenterPoint.x + sin * distance), (float) (mCenterPoint.y + distance * cos));
+            if (result.x < mCenterPoint.x) {
+                result.x = mCenterPoint.x;
+            }
+        } else {
+            result = new PointF((float) (mCenterPoint.x - sin * distance), (float) (mCenterPoint.y + distance * cos));
+            if (result.x > mCenterPoint.x) {
+                result.x = mCenterPoint.x;
+            }
         }
 
         return result;
     }
-
 
 
     //computer∠yxz angle 三个二维点定角度  对应A,B,C,
@@ -257,7 +292,6 @@ public class ProtractorView extends View {
 
         return angleInDegrees;
     }
-
 
 
     public interface MoveAngleCallBack {

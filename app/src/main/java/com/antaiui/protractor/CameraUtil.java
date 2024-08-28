@@ -11,6 +11,7 @@ import android.hardware.camera2.CameraCharacteristics;
 import android.hardware.camera2.CameraDevice;
 import android.hardware.camera2.CameraManager;
 import android.hardware.camera2.CaptureRequest;
+import android.hardware.camera2.TotalCaptureResult;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.util.Log;
@@ -22,6 +23,7 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 
+//使用camera2暂停和使用画布
 public class CameraUtil {
     private CameraDevice mCameraDevice;
     private HandlerThread mHandlerThread;
@@ -207,6 +209,37 @@ public class CameraUtil {
             e.printStackTrace();
         }
         return 0f;
+    }
+
+    //增加画面定格和还原方法
+    public void freezeFrame() {
+        if (mSession != null && mIsPreview) {
+            try {
+                // 只捕获一张静态图像
+                CaptureRequest request = mBuilder.build();
+                mSession.capture(request, new CameraCaptureSession.CaptureCallback() {
+                    @Override
+                    public void onCaptureCompleted(@NonNull CameraCaptureSession session,
+                                                   @NonNull CaptureRequest request,
+                                                   @NonNull TotalCaptureResult result) {
+                        super.onCaptureCompleted(session, request, result);
+                        Log.d(TAG, "Frame frozen.");
+                    }
+                }, mBgHandler);
+                // 停止重复请求
+                mSession.stopRepeating();
+                mIsPreview = false; // 标记为已定格
+            } catch (CameraAccessException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void resumePreview(final SurfaceTexture surfaceTexture) {
+        if (mCameraDevice != null && !mIsPreview) {
+            startPreview(surfaceTexture); // 重新开始预览
+            Log.d(TAG, "Preview resumed.");
+        }
     }
 
 }

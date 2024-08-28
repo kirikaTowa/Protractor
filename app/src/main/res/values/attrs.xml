@@ -3,5 +3,6 @@
     <declare-styleable name="ProtractorView">
         <attr name="colorMantle" format="reference|color" />
         <attr name="resPointer" format="reference|color" />
+        <attr name="isLeft" format="boolean" />
     </declare-styleable>
 </resources>
