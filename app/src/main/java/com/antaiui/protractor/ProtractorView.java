@@ -183,6 +183,7 @@ public class ProtractorView extends View {
 
         PointF result = new PointF((float) (mCenterPoint.x + cos * distance),
                 (float) (getHeight() - distance * sin));
+        //设定边界 防出界面
         if (result.y > mCenterPoint.y) {
             result.y = mCenterPoint.y;
         }
