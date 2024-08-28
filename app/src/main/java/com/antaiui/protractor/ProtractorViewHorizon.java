@@ -15,7 +15,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 
-public class ProtractorView extends View {
+public class ProtractorViewHorizon extends View {
     private PointF mCenterPoint;
     private Paint mPaint;
     private PointF mEndPoint1;
@@ -36,7 +36,7 @@ public class ProtractorView extends View {
     private MoveAngleCallBack mMoveAngleCallBack;
     private int mPaddingBottom = 30;
 
-    public ProtractorView(Context context) {
+    public ProtractorViewHorizon(Context context) {
         super(context);
     }
 
@@ -56,7 +56,7 @@ public class ProtractorView extends View {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
-    public ProtractorView(Context context, AttributeSet attributeSet) {
+    public ProtractorViewHorizon(Context context, AttributeSet attributeSet) {
         super(context, attributeSet);
 
     }
@@ -70,14 +70,14 @@ public class ProtractorView extends View {
             mPaint.setAntiAlias(true);
             //横版的话 左上角->竖着拿的右上角  才是【0.0】,当前坐标系【4x2】
             //[2,2]
-            mCenterPoint = new PointF(0, getHeight() /2f);
+            mCenterPoint = new PointF(getWidth() / 2f, getHeight() * 1.0f - mPaddingBottom);
             //[0,2]，左下角的位置
-            mPointLeft = new PointF(0, 0);
+            mPointLeft = new PointF(0, getHeight() * 1.0f - mPaddingBottom);
 
             //TODO 如果想改初始红线位置改这里
             //现在这种坐标，x保持中点不变，通过减法distance 往上连线得到，俩先设置一样，如果
-            mEndPoint1 = new PointF(mCenterPoint.x+ distance, mCenterPoint.y );
-            mEndPoint2 = new PointF(mCenterPoint.x+ distance, mCenterPoint.y );
+            mEndPoint1 = new PointF(mCenterPoint.x, mCenterPoint.y - distance);
+            mEndPoint2 = new PointF(mCenterPoint.x, mCenterPoint.y - distance);
 
 
             BitmapFactory.Options options = new BitmapFactory.Options();
@@ -106,19 +106,19 @@ public class ProtractorView extends View {
 
         RectF oval = new RectF(mCenterPoint.x - distance, mCenterPoint.y - distance, mCenterPoint.x + distance, mCenterPoint.y + distance);
         //mDegreeL，第一个参数需要动态调整，他的初始角度是-90，原因未知
-        canvas.drawArc(oval, mDegreeL + 270f, mDegreeR - mDegreeL, true, fanPaint); // 绘制扇形
+        canvas.drawArc(oval, mDegreeL + 180f, mDegreeR - mDegreeL, true, fanPaint); // 绘制扇形
 
 
         Matrix matrix = new Matrix();
         int offsetX = bitmap.getWidth();
         int offsetY = bitmap.getHeight();
         matrix.preTranslate(mCenterPoint.x - offsetX, mCenterPoint.y - offsetY / 2f);
-        matrix.postRotate(mDegreeL+ 90f, mCenterPoint.x, mCenterPoint.y);
+        matrix.postRotate(mDegreeL, mCenterPoint.x, mCenterPoint.y);
         canvas.drawBitmap(bitmap, matrix, mPaint);
 
         Matrix matrixR = new Matrix();
         matrixR.preTranslate(mCenterPoint.x - offsetX, mCenterPoint.y - offsetY / 2f);
-        matrixR.postRotate(mDegreeR+90f, mCenterPoint.x, mCenterPoint.y);
+        matrixR.postRotate(mDegreeR, mCenterPoint.x, mCenterPoint.y);
         canvas.drawBitmap(bitmap, matrixR, mPaint);
 
 
@@ -176,16 +176,16 @@ public class ProtractorView extends View {
         double distanceToCenter = Math.sqrt(Math.pow(movePoint.x - mCenterPoint.x, 2)
                 + Math.pow(movePoint.y - mCenterPoint.y, 2));
         //圆心到movepoint垂直距离：(getHeight() - movePoint.y)
-        double sin = ( movePoint.x) / distanceToCenter;
-        //圆心到 movePoint 的水平距离（movePoint.x - mCenterPoint.x） 这个用小减大
-        double cos = ( movePoint.y-mCenterPoint.y) / distanceToCenter;
+        double sin = (getHeight() - movePoint.y) / distanceToCenter;
+        //圆心到 movePoint 的水平距离（movePoint.x - mCenterPoint.x）
+        double cos = (movePoint.x - mCenterPoint.x) / distanceToCenter;
 
 
-        PointF result = new PointF((float) (mCenterPoint.x + sin * distance),
-                (float) ( mCenterPoint.y+distance * cos));
+        PointF result = new PointF((float) (mCenterPoint.x + cos * distance),
+                (float) (getHeight() - distance * sin));
         //设定边界 防出界面
-        if (result.x < mCenterPoint.x) {
-            result.x = mCenterPoint.x;
+        if (result.y > mCenterPoint.y) {
+            result.y = mCenterPoint.y;
         }
 
         return result;
