@@ -44,6 +44,8 @@ public class MainActivity extends AppCompatActivity implements TextureView.Surfa
         mCameraPreview.setSurfaceTextureListener(this);
         mProtractorView = findViewById(R.id.protractor_view);
         mProtractorView.setMoveAngleCallBack(this);
+        //反向其实可以不用这么麻烦，直接用这个180就行了
+        //mProtractorView.setRotation(180f);
         mTvAngle = findViewById(R.id.tv_angle);
        // mTvAngle.setTypeface(Typeface.createFromAsset(getAssets(),  "BatmanForeverAlternate.ttf"));
 

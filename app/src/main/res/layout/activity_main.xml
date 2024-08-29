@@ -13,7 +13,7 @@
         android:id="@+id/protractor_view"
         app:isLeft="false"
         app:colorMantle="#804EA3FF"
-        app:resPointer="@drawable/pointer_icon_audit"
+        app:resPointer="@drawable/pointer_icon"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
