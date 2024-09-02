@@ -4,5 +4,6 @@
         <attr name="colorMantle" format="reference|color" />
         <attr name="resPointer" format="reference|color" />
         <attr name="isLeft" format="boolean" />
+        <attr name="distance" format="dimension" />
     </declare-styleable>
 </resources>

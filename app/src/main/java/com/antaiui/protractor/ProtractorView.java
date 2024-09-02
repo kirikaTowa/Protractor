@@ -67,6 +67,7 @@ public class ProtractorView extends View {
         colorMantle = typedArray.getColor(R.styleable.ProtractorView_colorMantle, Color.BLUE);
         resPointer = typedArray.getResourceId(R.styleable.ProtractorView_resPointer, R.drawable.pointer_icon);
         isLeft = typedArray.getBoolean(R.styleable.ProtractorView_isLeft,true);
+        distance = (int) typedArray.getDimension(R.styleable.ProtractorView_distance, distance);
 
         typedArray.recycle();
     }

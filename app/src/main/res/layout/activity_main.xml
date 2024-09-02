@@ -12,6 +12,7 @@
     <com.antaiui.protractor.ProtractorView
         android:id="@+id/protractor_view"
         app:isLeft="false"
+        app:distance="191dp"
         app:colorMantle="#804EA3FF"
         app:resPointer="@drawable/pointer_icon"
         android:layout_width="match_parent"
