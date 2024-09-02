@@ -121,7 +121,8 @@ public class ProtractorView extends View {
 
 
             BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inSampleSize = 2;
+
+            //不需要缩为1/2 options.inSampleSize = 2;用xx适配算求
             bitmap = BitmapFactory.decodeResource(getResources(), resPointer, options);
             Matrix matrix = new Matrix();
             //让图片转到正确角度，如果切图是横着的，可以调这个来实现效果
